@@ -1,0 +1,13 @@
+{
+  "totalSurah": 114,
+  "totalAyah": 6236,
+  "totalPages": 604,
+  "totalJuz": 30,
+  "note": "Metadata lengkap surah (nama, jumlah ayat, halaman awal, juz) diambil dan di-cache otomatis dari Al Quran Cloud API (GET /surah) saat aplikasi pertama kali online, lalu disimpan di IndexedDB (store: meta, key: surahList) untuk pemakaian offline.",
+  "fallbackSurah": [
+    { "number": 1, "name": "الفاتحة", "englishName": "Al-Fatihah", "numberOfAyahs": 7, "startPage": 1 },
+    { "number": 112, "name": "الإخلاص", "englishName": "Al-Ikhlas", "numberOfAyahs": 4, "startPage": 604 },
+    { "number": 113, "name": "الفلق", "englishName": "Al-Falaq", "numberOfAyahs": 5, "startPage": 604 },
+    { "number": 114, "name": "الناس", "englishName": "An-Nas", "numberOfAyahs": 6, "startPage": 604 }
+  ]
+}

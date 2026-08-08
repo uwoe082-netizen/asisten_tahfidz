@@ -1,0 +1,164 @@
+/* ============================================================
+   HAFIZ — Mushaf Pojok (15-line) layout
+   ============================================================ */
+
+.mushaf-wrap {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.mushaf-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  margin-bottom: .6rem;
+}
+.mushaf-toolbar .arrow-btn {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  border-radius: 50%;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  color: var(--color-primary-600);
+}
+.mushaf-toolbar .arrow-btn:disabled { opacity: .3; }
+.mushaf-toolbar .jump-btn {
+  flex: 1;
+  text-align: center;
+  font-size: .78rem;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+}
+.mushaf-toolbar .jump-btn strong { color: var(--color-text-primary); }
+
+.mushaf-page {
+  aspect-ratio: 1 / 1.5;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: .9rem 1.1rem;
+  background: var(--color-bg-mushaf);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.mushaf-progress {
+  position: absolute;
+  top: 0; right: 0; left: 0;
+  height: 3px;
+  background: var(--color-border-light);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  overflow: hidden;
+}
+.mushaf-progress-fill {
+  height: 100%;
+  width: 0%;
+  margin-left: auto;
+  background: linear-gradient(90deg, var(--color-accent-400), var(--color-primary-400));
+  transition: width .5s ease-out;
+}
+
+.mushaf-header {
+  text-align: center;
+  border: 2px solid var(--color-accent-400);
+  border-radius: var(--radius-sm);
+  padding: .3rem .8rem;
+  background: linear-gradient(135deg, var(--color-accent-50), var(--color-accent-100));
+  margin-bottom: .5rem;
+  font-family: var(--font-arabic);
+  font-size: 1.1rem;
+  color: var(--color-primary-800);
+}
+[data-theme="dark"] .mushaf-header {
+  background: linear-gradient(135deg, #2a2410, #201d0f);
+  color: var(--color-accent-300);
+}
+.mushaf-header .bismillah { display: block; margin-top: .15rem; font-size: 1.15rem; }
+
+.mushaf-body {
+  direction: rtl;
+  text-align: justify;
+  text-align-last: justify;
+  text-justify: inter-word;
+  font-family: var(--font-arabic);
+  font-size: var(--font-arabic-size-mushaf);
+  line-height: var(--mushaf-line-height);
+  color: var(--color-text-mushaf);
+  height: calc(100% - 60px);
+  overflow: hidden;
+}
+
+.word {
+  display: inline-block;
+  padding: 0 1px;
+  border-radius: 3px;
+  position: relative;
+  transition: color .2s ease;
+}
+.word.active-word { background: var(--color-primary-100); }
+[data-theme="dark"] .word.active-word { background: var(--color-primary-800); }
+
+.ayah-marker {
+  font-family: var(--font-arabic);
+  color: var(--color-accent-500);
+  font-size: .85em;
+  margin: 0 .15em;
+}
+
+.mushaf-footer {
+  position: absolute;
+  bottom: .5rem; left: 1.1rem; right: 1.1rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: .68rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-ui);
+}
+
+/* --- Progressive reveal states --- */
+.mushaf-page.reveal-mode .word {
+  filter: blur(8px);
+  opacity: .15;
+  transition: filter .5s ease-out, opacity .5s ease-out, transform .5s ease-out;
+  user-select: none;
+}
+.mushaf-page.reveal-mode .word.revealed { filter: blur(0); opacity: 1; }
+.mushaf-page.reveal-mode .word.revealing { animation: wordReveal .6s cubic-bezier(.22,1,.36,1) forwards; }
+.mushaf-page.reveal-mode.full-blank .word:not(.revealed) { filter: blur(14px); opacity: .06; }
+
+.word.error-wrong {
+  background: rgba(212,84,84,.15);
+  border-bottom: 2px solid var(--color-error);
+  border-radius: 2px;
+  animation: shakeError .4s ease-in-out;
+}
+.word.error-similar {
+  background: rgba(232,168,56,.15);
+  border-bottom: 2px dashed var(--color-warning);
+}
+.word.error-skipped {
+  outline: 2px dashed var(--color-error);
+  outline-offset: 2px;
+  opacity: .5 !important;
+}
+.word.hint-used { background: rgba(91,155,213,.18); }
+
+.mushaf-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; gap: .6rem; color: var(--color-text-secondary); text-align: center; padding: 2rem 1rem;
+}
+
+/* Slide page transition */
+.mushaf-page.slide-left { animation: slideLeft .28s ease; }
+.mushaf-page.slide-right { animation: slideRight .28s ease; }
+
+@media (max-width: 380px) {
+  .mushaf-page { padding: .7rem .8rem; }
+}
