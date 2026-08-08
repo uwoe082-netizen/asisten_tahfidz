@@ -14,6 +14,7 @@ class SpeechEngine {
     this.onError = null;        // (err) => {}
     this._restartTimer = null;
     this._shouldContinue = false;
+    this._segmentWordCounts = {}; // resultIndex -> jumlah kata yang sudah dicocokkan di segmen itu
 
     if (this.supported) {
       this.recognition = new SR();
@@ -36,6 +37,7 @@ class SpeechEngine {
     }
     this.targetWords = targetWords;
     this.pointer = 0;
+    this._segmentWordCounts = {};
     this._shouldContinue = true;
     try {
       this.recognition.start();
@@ -49,6 +51,7 @@ class SpeechEngine {
   stop() {
     this._shouldContinue = false;
     this.listening = false;
+    this._segmentWordCounts = {};
     if (this.recognition) {
       try { this.recognition.stop(); } catch (e) {}
     }
@@ -78,17 +81,32 @@ class SpeechEngine {
   }
 
   _handleResult(event) {
-    let transcript = '';
+    // Setiap segmen hasil (index i) bisa terpicu berkali-kali selagi Chrome
+    // merevisi tebakan interim-nya sebelum final. Kita lacak berapa kata yang
+    // sudah pernah dicocokkan di segmen itu, dan hanya proses kata BARU —
+    // supaya kata yang sama tidak dicocokkan berulang kali (yang menyebabkan
+    // pointer maju lebih cepat dari bacaan sebenarnya).
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript + ' ';
+      const result = event.results[i];
+      const words = Utils.splitWords(result[0].transcript);
+      const alreadyProcessed = this._segmentWordCounts[i] || 0;
+      const newWords = words.slice(alreadyProcessed);
+
+      if (newWords.length) {
+        this._matchWords(newWords);
+        this._segmentWordCounts[i] = words.length;
+      }
+
+      if (result.isFinal) {
+        // Segmen ini sudah final dan tidak akan berubah lagi — bebaskan tracking-nya.
+        delete this._segmentWordCounts[i];
+      }
     }
-    this._matchTranscript(transcript);
   }
 
-  /** Fuzzy match transcript against target words with 3-5 word lookahead */
-  _matchTranscript(transcript) {
+  /** Fuzzy match array kata BARU (belum pernah diproses) terhadap target words dengan lookahead */
+  _matchWords(spoken) {
     if (!this.targetWords || !this.targetWords.length) return;
-    const spoken = Utils.splitWords(transcript);
     if (!spoken.length) return;
 
     spoken.forEach(spokenWord => {
